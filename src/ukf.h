@@ -64,11 +64,32 @@ public:
   ///* Augmented state dimension
   int n_aug_;
 
+  // Radar, laser number of measured states:
+  int n_z_r_, n_z_l_;
+
   ///* Sigma point spreading parameter
   double lambda_;
 
     // previous time stamp:
     double previous_timestamp_;
+
+  //create augmented mean vector
+  VectorXd x_aug ;
+
+  //create augmented state covariance
+  MatrixXd P_aug;
+
+  //create sigma point matrix
+  MatrixXd Xsig_aug;
+
+  //create vector for weights
+  VectorXd weights;
+
+  //create vector for predicted state
+  VectorXd x;
+
+  //create covariance matrix for prediction
+  MatrixXd P;
 
 
   /**
