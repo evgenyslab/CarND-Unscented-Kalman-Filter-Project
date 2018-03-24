@@ -18,7 +18,6 @@ UKF::UKF() {
   // if this is false, radar measurements will be ignored (except during init)
   use_radar_ = true;
 
-
   // initial state vector
   x_ = VectorXd(5);
 
@@ -48,13 +47,6 @@ UKF::UKF() {
   std_radrd_ = 0.3;
   //DO NOT MODIFY measurement noise values above these are provided by the sensor manufacturer.
 
-  /**
-  TODO:
-
-  Complete the initialization. See ukf.h for other member properties.
-
-  Hint: one or more values initialized above might be wildly off...
-  */
   // Initialization:
   is_initialized_ = false;
   // States:
@@ -91,11 +83,6 @@ UKF::~UKF() {}
  */
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   /**
-  TODO:
-
-  Complete this function! Make sure you switch between lidar and radar
-  measurements.
-
    Initialize
    Predict
    Update
@@ -147,8 +134,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   }
 
 
-
-
 }
 
 /**
@@ -157,12 +142,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
  * measurement and this one.
  */
 void UKF::Prediction(double delta_t) {
-  /**
-  TODO:
 
-  Complete this function! Estimate the object's location. Modify the state
-  vector, x_. Predict sigma points, the state, and the state covariance matrix.
-  */
   /* 2.1 Generate Sigma Points:
     *
     * Generate sigma points using augmentation.
@@ -246,7 +226,6 @@ void UKF::Prediction(double delta_t) {
    *
    * */
 
-
   // set weights
   double weight_0 = lambda_/(lambda_+n_aug_);
   weights(0) = weight_0;
@@ -282,15 +261,6 @@ void UKF::Prediction(double delta_t) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
-  /**
-  TODO:
-
-  Complete this function! Use lidar data to update the belief about the object's
-  position. Modify the state vector, x_, and covariance, P_.
-
-  You'll also need to calculate the lidar NIS.
-  */
-
 
   MatrixXd Zsig = MatrixXd(n_z_l_, 2 * n_aug_ + 1);
   //transform sigma points into measurement space - direct mapping
@@ -318,9 +288,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   R <<    std_laspx_*std_laspx_, 0,
       0, std_laspy_*std_laspy_;
   S = S + R;
-  /* 3.1. Update LASER:
-   *
-   * */
+
   //create matrix for cross correlation Tc
   MatrixXd Tc = MatrixXd(n_x_, n_z_l_);
   //calculate cross correlation matrix
@@ -332,8 +300,6 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
     // state difference
     VectorXd x_diff = Xsig_pred_.col(i) - x_;
-
-
     Tc = Tc + weights(i) * x_diff * z_diff.transpose();
   }
 
@@ -346,9 +312,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   //residual
   VectorXd z_diff = z - z_pred;
 
-  /* 3.2 Update State
- *
- * */
+
   //update state mean and covariance matrix
   x_ = x_ + K * z_diff;
   P_ = P_ - K*S*K.transpose();
@@ -366,15 +330,8 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
-  /**
-  TODO:
 
-  Complete this function! Use radar data to update the belief about the object's
-  position. Modify the state vector, x_, and covariance, P_.
-
-  You'll also need to calculate the radar NIS.
-  */
-
+    // create matrix for measurement sigma points:
   MatrixXd Zsig = MatrixXd(n_z_r_, 2 * n_aug_ + 1);
   //transform sigma points into measurement space
   for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //2n+1 simga points
@@ -421,9 +378,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
       0, std_radphi_*std_radphi_, 0,
       0, 0,std_radrd_*std_radrd_;
   S = S + R;
-  /* 3.1. Update RADAR:
-   *
-   * */
+
   //create matrix for cross correlation Tc
   MatrixXd Tc = MatrixXd(n_x_, n_z_r_);
   //calculate cross correlation matrix
@@ -469,7 +424,8 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   // NIS Radar should be less than 5% of Xhi squared distribution with 3 degrees of freedom = 7.815
   if (NIS > 7.815){
     std::cout << "WARNING: RADAR NIS is Greater than 5% Likelihood! " << NIS << "\n";
-    // if NIS is too large, what to do?:
+    // Should do Chi-squared statistical testing - take 20-samples of NIS and see if more than 5% are outside of bounds
+
 
   }
 }
